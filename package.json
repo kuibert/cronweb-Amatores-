@@ -1,0 +1,21 @@
+{
+  "name": "cronweb-amatores",
+  "version": "1.0.0",
+  "description": "Interfaz web para gestionar tareas programadas con crontab - Sistemas Operativos",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "php -S localhost:8000 -t public",
+    "dev": "php -S localhost:8000 -t public"
+  },
+  "keywords": [
+    "cron",
+    "crontab",
+    "web",
+    "scheduler",
+    "bootstrap"
+  ],
+  "author": "Amatores Team",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amatores - Planificador de Tareas Cron</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-clock-history"></i> Amatores Cron Manager
+            </a>
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('tasks')">
+                                <i class="bi bi-list-task"></i> Listar Tareas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="openNewTaskModal()">
+                                <i class="bi bi-plus-circle"></i> Nueva Tarea
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('crontab')">
+                                <i class="bi bi-file-text"></i> Ver Crontab
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="pt-3">
+                <!-- Dashboard -->
+                <div id="dashboard-section" class="content-section">
+                    <h1 class="mb-4">Dashboard</h1>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-list-task fs-1 text-primary"></i>
+                                    <h5 class="card-title mt-2">Total Tareas</h5>
+                                    <h2 id="totalTasks" class="text-primary">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-play-circle fs-1 text-success"></i>
+                                    <h5 class="card-title mt-2">Activas</h5>
+                                    <h2 id="activeTasks" class="text-success">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-pause-circle fs-1 text-warning"></i>
+                                    <h5 class="card-title mt-2">Inactivas</h5>
+                                    <h2 id="inactiveTasks" class="text-warning">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas -->
+                <div id="tasks-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Administrar Cron Jobs</h1>
+                
+                    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newTaskModal">
+                        <i class="bi bi-plus-circle"></i> Nueva Tarea
+                    </button>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Tareas Programadas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="cronTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Estado</th>
+                                            <th>Comando</th>
+                                            <th>Programación</th>
+                                            <th>Descripción</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cronTableBody">
+                                        <!-- Las tareas se cargarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ver Crontab -->
+                <div id="crontab-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Crontab Actual</h1>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Contenido del Crontab</h5>
+                        </div>
+                        <div class="card-body">
+                            <pre id="crontabContent" class="bg-dark text-light p-3 rounded">Cargando...</pre>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para nueva tarea -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Tarea Cron</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="cronForm">
+                        <div class="mb-3">
+                            <label for="cronCommand" class="form-label">Comando</label>
+                            <input type="text" class="form-control" id="cronCommand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cronDescription" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="cronDescription">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label for="cronMinute" class="form-label">Minuto</label>
+                                <input type="text" class="form-control" id="cronMinute" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronHour" class="form-label">Hora</label>
+                                <input type="text" class="form-control" id="cronHour" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronDay" class="form-label">Día</label>
+                                <input type="text" class="form-control" id="cronDay" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronMonth" class="form-label">Mes</label>
+                                <input type="text" class="form-control" id="cronMonth" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronWeekday" class="form-label">Día Semana</label>
+                                <input type="text" class="form-control" id="cronWeekday" placeholder="*" value="*">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Formato: minuto (0-59), hora (0-23), día (1-31), mes (1-12), día de la semana (0-7)
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCronJob()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
