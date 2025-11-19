@@ -209,6 +209,124 @@ class CronManager {
         file_put_contents($this->cronFile, json_encode($jobs, JSON_PRETTY_PRINT));
     }
     
+    public function runJob($index) {
+        try {
+            $jobs = $this->loadJobs();
+            
+            if (!isset($jobs[$index])) {
+                throw new Exception('Tarea no encontrada');
+            }
+            
+            $job = $jobs[$index];
+            $command = $job['command'];
+            
+            // Ejecutar comando
+            exec($command . ' 2>&1', $output, $returnCode);
+            
+            $result = [
+                'success' => $returnCode === 0,
+                'output' => implode("\n", $output),
+                'return_code' => $returnCode
+            ];
+            
+            // Guardar log
+            $this->addLog($command, $returnCode === 0 ? 'success' : 'error', $result['output']);
+            
+            // Actualizar última ejecución
+            $jobs[$index]['last_execution'] = date('Y-m-d H:i:s');
+            $jobs[$index]['last_status'] = $returnCode === 0 ? 'success' : 'error';
+            $this->saveJobs($jobs);
+            
+            return $result;
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    public function getLogs() {
+        $logFile = __DIR__ . '/execution_logs.json';
+        if (!file_exists($logFile)) {
+            return [];
+        }
+        
+        $content = file_get_contents($logFile);
+        $logs = json_decode($content, true) ?: [];
+        
+        // Ordenar por fecha descendente
+        usort($logs, function($a, $b) {
+            return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+        });
+        
+        // Limitar a los últimos 100 logs
+        return array_slice($logs, 0, 100);
+    }
+    
+    public function clearLogs() {
+        $logFile = __DIR__ . '/execution_logs.json';
+        file_put_contents($logFile, json_encode([]));
+        return ['success' => true, 'message' => 'Logs limpiados'];
+    }
+    
+    public function importJobs($importedJobs) {
+        try {
+            if (!is_array($importedJobs)) {
+                throw new Exception('Formato de datos inválido');
+            }
+            
+            $currentJobs = $this->loadJobs();
+            
+            foreach ($importedJobs as $job) {
+                // Validar estructura del job
+                if (!isset($job['command']) || !isset($job['schedule'])) {
+                    continue;
+                }
+                
+                $newJob = [
+                    'id' => uniqid(),
+                    'command' => $job['command'],
+                    'description' => $job['description'] ?? '',
+                    'schedule' => $job['schedule'],
+                    'enabled' => $job['enabled'] ?? true,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'imported' => true
+                ];
+                
+                $currentJobs[] = $newJob;
+            }
+            
+            $this->saveJobs($currentJobs);
+            $this->updateSystemCrontab();
+            
+            return ['success' => true, 'message' => 'Tareas importadas exitosamente'];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    private function addLog($command, $status, $output) {
+        $logFile = __DIR__ . '/execution_logs.json';
+        $logs = [];
+        
+        if (file_exists($logFile)) {
+            $content = file_get_contents($logFile);
+            $logs = json_decode($content, true) ?: [];
+        }
+        
+        $logs[] = [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'command' => $command,
+            'status' => $status,
+            'output' => substr($output, 0, 500) // Limitar salida
+        ];
+        
+        // Mantener solo los últimos 1000 logs
+        if (count($logs) > 1000) {
+            $logs = array_slice($logs, -1000);
+        }
+        
+        file_put_contents($logFile, json_encode($logs, JSON_PRETTY_PRINT));
+    }
+    
     private function updateSystemCrontab() {
         $jobs = $this->loadJobs();
         $cronContent = "# Amatores Cron Manager - Tareas generadas automáticamente\n";
@@ -270,6 +388,35 @@ switch ($action) {
     case 'delete':
         $index = (int)$_POST['index'];
         $result = $cronManager->deleteJob($index);
+        echo json_encode($result);
+        break;
+        
+    case 'run':
+        $index = (int)$_POST['index'];
+        $result = $cronManager->runJob($index);
+        echo json_encode($result);
+        break;
+        
+    case 'logs':
+        $result = $cronManager->getLogs();
+        echo json_encode($result);
+        break;
+        
+    case 'clear_logs':
+        $result = $cronManager->clearLogs();
+        echo json_encode($result);
+        break;
+        
+    case 'export':
+        $jobs = $cronManager->loadJobs();
+        header('Content-Type: application/json');
+        header('Content-Disposition: attachment; filename="cron_backup.json"');
+        echo json_encode($jobs, JSON_PRETTY_PRINT);
+        break;
+        
+    case 'import':
+        $data = json_decode($_POST['data'], true);
+        $result = $cronManager->importJobs($data);
         echo json_encode($result);
         break;
         

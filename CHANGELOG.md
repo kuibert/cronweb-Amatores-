@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.0.0] - 2024-12-19
+
+### 🚀 Funcionalidades Avanzadas Agregadas
+- **Búsqueda y filtros** - Buscar tareas por comando/descripción, filtrar por estado
+- **Plantillas predefinidas** - Diario, semanal, mensual, backup con comandos incluidos
+- **Validador de expresiones cron** - Preview en tiempo real con descripción en lenguaje natural
+- **Ejecutar tareas manualmente** - Botón "Ejecutar Ahora" con resultado inmediato
+- **Sistema de logs completo** - Historial de ejecuciones con estado y salida
+- **Exportar/Importar tareas** - Backup y restauración en formato JSON
+- **Configuración avanzada** - Tema oscuro, zona horaria, personalización
+- **Dashboard mejorado** - Estadísticas detalladas y actualizaciones en tiempo real
+- **Interfaz responsive** - Optimizada para móviles y tablets
+- **Alertas flotantes** - Notificaciones mejoradas con animaciones
+
+### 🎨 Mejoras de UI/UX
+- Sidebar con navegación completa (Dashboard, Tareas, Logs, Configuración)
+- Tabla responsive con columna de última ejecución
+- Botones de acción agrupados con tooltips
+- Animaciones suaves y transiciones
+- Tema oscuro completo
+- Plantillas rápidas con un clic
+
+### 🔧 Mejoras Técnicas
+- Backend PHP expandido con nuevos endpoints
+- Validación robusta de expresiones cron
+- Sistema de logging con rotación automática
+- Manejo de errores mejorado
+- Auto-refresh del crontab después de cambios
+- Almacenamiento de configuración en localStorage
+
 ## [1.0.0] - 2024-12-19
 
 ### ✨ Funcionalidades Iniciales

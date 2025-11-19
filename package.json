@@ -1,6 +1,6 @@
 {
   "name": "cronweb-amatores",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Interfaz web para gestionar tareas programadas con crontab - Sistemas Operativos",
   "main": "public/index.html",
   "scripts": {

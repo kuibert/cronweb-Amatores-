@@ -1,0 +1,5 @@
+# Amatores Cron Manager - Tareas generadas automáticamente
+30 9 * * * echo "Hola mundo" # Tarea de prueba
+* 9 * * * echo "Hola mundo" # Tarea diaria a las 9:00 AM
+* 9 * * 1 echo "Hola mundo" # Tarea semanal los lunes a las 9:00 AM
+6 23 * * * echo "Hola mundo" # Tarea de prueba
