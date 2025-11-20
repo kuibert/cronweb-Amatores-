@@ -7,22 +7,22 @@ let filteredJobs = [];
 // Plantillas predefinidas
 const cronTemplates = {
     daily: { 
-        command: 'echo "Tarea diaria ejecutada: $(date)" >> /tmp/daily.log',
+        command: 'echo Tarea diaria ejecutada',
         minute: '0', hour: '9', day: '*', month: '*', weekday: '*', 
         description: 'Tarea diaria a las 9:00 AM' 
     },
     weekly: { 
-        command: 'echo "Tarea semanal ejecutada: $(date)" >> /tmp/weekly.log',
+        command: 'echo Tarea semanal ejecutada',
         minute: '0', hour: '9', day: '*', month: '*', weekday: '1', 
         description: 'Tarea semanal los lunes a las 9:00 AM' 
     },
     monthly: { 
-        command: 'echo "Tarea mensual ejecutada: $(date)" >> /tmp/monthly.log',
+        command: 'echo Tarea mensual ejecutada',
         minute: '0', hour: '9', day: '1', month: '*', weekday: '*', 
         description: 'Tarea mensual el día 1 a las 9:00 AM' 
     },
     backup: { 
-        command: 'tar -czf /tmp/backup_$(date +%Y%m%d).tar.gz /home',
+        command: 'echo Backup ejecutado',
         minute: '0', hour: '2', day: '*', month: '*', weekday: '*', 
         description: 'Backup automático a las 2:00 AM' 
     }

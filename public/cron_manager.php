@@ -200,7 +200,7 @@ class CronManager {
         }
     }
     
-    private function loadJobs() {
+    public function loadJobs() {
         $content = file_get_contents($this->cronFile);
         return json_decode($content, true) ?: [];
     }

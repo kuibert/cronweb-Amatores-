@@ -1,72 +1,42 @@
 [
     {
-        "id": "691e1f69a5e78",
-        "command": "echo \"test\"",
-        "description": "Prueba simple",
-        "schedule": "30 9 * * *",
-        "enabled": false,
-        "created_at": "2025-11-19 20:50:01",
-        "last_execution": "2025-11-19 21:19:27",
-        "last_status": "success"
-    },
-    {
-        "id": "691e227fab826",
-        "command": "echo \"Hola mundo\"",
-        "description": "Tarea de prueba",
-        "schedule": "30 9 * * *",
-        "enabled": true,
-        "created_at": "2025-11-19 21:03:11",
-        "last_execution": "2025-11-19 21:21:31",
-        "last_status": "success"
-    },
-    {
-        "id": "691e261fc96dc",
-        "command": "echo \"Hola mundo\"",
+        "id": "691e7e4b8ca13",
+        "command": "echo Tarea diaria ejecutada",
         "description": "Tarea diaria a las 9:00 AM",
         "schedule": "* 9 * * *",
         "enabled": true,
-        "created_at": "2025-11-19 21:18:39",
-        "last_execution": "2025-11-19 21:21:33",
+        "created_at": "2025-11-20 03:34:51",
+        "last_execution": "2025-11-20 03:34:53",
         "last_status": "success"
     },
     {
-        "id": "691e262665bca",
-        "command": "echo \"Hola mundo\"",
+        "id": "691e7eb8284b6",
+        "command": "echo Tarea semanal ejecutada",
         "description": "Tarea semanal los lunes a las 9:00 AM",
         "schedule": "* 9 * * 1",
         "enabled": true,
-        "created_at": "2025-11-19 21:18:46",
-        "last_execution": "2025-11-19 21:21:36",
+        "created_at": "2025-11-20 03:36:40",
+        "last_execution": "2025-11-20 03:36:55",
         "last_status": "success"
     },
     {
-        "id": "691e262f1b5d6",
-        "command": "echo \"Hola mundo\"",
+        "id": "691e7ee557439",
+        "command": "echo Tarea mensual ejecutada",
         "description": "Tarea mensual el d\u00eda 1 a las 9:00 AM",
         "schedule": "* 9 1 * *",
-        "enabled": false,
-        "created_at": "2025-11-19 21:18:55",
-        "last_execution": "2025-11-19 21:22:07",
+        "enabled": true,
+        "created_at": "2025-11-20 03:37:25",
+        "last_execution": "2025-11-20 03:38:10",
         "last_status": "success"
     },
     {
-        "id": "691e26350de7a",
-        "command": "echo \"Hola mundo\"",
-        "description": "Backup autom\u00e1tico a las 2:00 AM",
-        "schedule": "* 2 * * *",
-        "enabled": false,
-        "created_at": "2025-11-19 21:19:01",
-        "last_execution": "2025-11-19 21:22:04",
-        "last_status": "success"
-    },
-    {
-        "id": "691e267890b16",
+        "id": "691e7f0b998ff",
         "command": "echo \"Hola mundo\"",
         "description": "Tarea de prueba",
-        "schedule": "6 23 * * *",
+        "schedule": "6 7 8 3 6",
         "enabled": true,
-        "created_at": "2025-11-19 21:20:08",
-        "last_execution": "2025-11-19 21:20:18",
+        "created_at": "2025-11-20 03:38:03",
+        "last_execution": "2025-11-20 03:38:12",
         "last_status": "success"
     }
 ]

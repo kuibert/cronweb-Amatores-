@@ -1,74 +1,26 @@
 [
     {
-        "timestamp": "2025-11-19 21:19:27",
-        "command": "echo \"test\"",
+        "timestamp": "2025-11-20 03:36:44",
+        "command": "echo Tarea semanal ejecutada",
         "status": "success",
-        "output": "\"test\""
+        "output": "Tarea semanal ejecutada"
     },
     {
-        "timestamp": "2025-11-19 21:19:37",
+        "timestamp": "2025-11-20 03:36:55",
+        "command": "echo Tarea semanal ejecutada",
+        "status": "success",
+        "output": "Tarea semanal ejecutada"
+    },
+    {
+        "timestamp": "2025-11-20 03:38:10",
+        "command": "echo Tarea mensual ejecutada",
+        "status": "success",
+        "output": "Tarea mensual ejecutada"
+    },
+    {
+        "timestamp": "2025-11-20 03:38:12",
         "command": "echo \"Hola mundo\"",
         "status": "success",
         "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:19:39",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:19:42",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:20:18",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:21:31",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:21:33",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:21:36",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:22:04",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:22:07",
-        "command": "echo \"Hola mundo\"",
-        "status": "success",
-        "output": "\"Hola mundo\""
-    },
-    {
-        "timestamp": "2025-11-19 21:23:37",
-        "command": "echo \"Tarea diaria ejecutada: $(date)\" >> \/tmp\/daily.log",
-        "status": "error",
-        "output": ""
-    },
-    {
-        "timestamp": "2025-11-19 21:29:31",
-        "command": "echo \"Tarea diaria ejecutada: $(date)\" >> \/tmp\/daily.log",
-        "status": "error",
-        "output": ""
     }
 ]
