@@ -1,9 +1,11 @@
 RewriteEngine On
 
-# Redirigir todas las solicitudes a index.html si no es un archivo o directorio
+# No redirigir si es un archivo o directorio real
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.html [QSA,L]
+
+# Redirigir solo rutas que no sean archivos/directorios a index.html
+RewriteRule ^(?!cron_manager\.php)(.*)$ index.html [QSA,L]
 
 # Configuración de seguridad
 <Files "*.json">
