@@ -38,5 +38,25 @@
         "created_at": "2025-11-20 03:38:03",
         "last_execution": "2025-11-20 03:38:12",
         "last_status": "success"
+    },
+    {
+        "id": "69212b5bca8cf",
+        "command": "echo Tarea diaria ejecutada",
+        "description": "Tarea diaria a las 9:00 AM",
+        "schedule": "* 9 * * *",
+        "enabled": true,
+        "created_at": "2025-11-22 04:17:47",
+        "last_execution": "2025-11-22 04:18:21",
+        "last_status": "success"
+    },
+    {
+        "id": "69212b8f3d0b5",
+        "command": "echo Tarea mensual ejecutada",
+        "description": "Tarea mensual el d\u00eda 1 a las 9:00 AM",
+        "schedule": "* 9 1 * *",
+        "enabled": true,
+        "created_at": "2025-11-22 04:18:39",
+        "last_execution": "2025-11-22 04:18:42",
+        "last_status": "success"
     }
 ]

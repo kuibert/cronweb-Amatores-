@@ -27,10 +27,15 @@ cd cronweb-Amatores-
 php -S localhost:8000 -t public
 ```
 
-### Producción Ubuntu 24.04.3 LTS
+### Despliegue SSH Remoto ⭐ (Recomendado)
 ```bash
-git clone https://github.com/tu-usuario/cronweb-Amatores-.git
-cd cronweb-Amatores-
+chmod +x deploy-remote.sh
+./deploy-remote.sh usuario@servidor.com /var/www/cronweb
+```
+Ver: [DEPLOY-SSH.md](DEPLOY-SSH.md)
+
+### Producción Ubuntu 24.04.3 LTS (Local)
+```bash
 chmod +x ubuntu24-install.sh
 ./ubuntu24-install.sh
 ```
@@ -42,11 +47,11 @@ cronweb-Amatores-/
 │   ├── index.html         # Interfaz principal
 │   ├── css/style.css      # Estilos personalizados
 │   └── js/app.js          # JavaScript frontend
-├── src/                   # Backend PHP
-│   └── cron_manager.php   # API para gestión de cron
-├── deploy.sh              # Script de despliegue general
-├── ubuntu24-install.sh    # Instalación Ubuntu 24.04.3
-├── test-server.sh         # Script de verificación
+├── deploy-remote.sh       # Despliegue SSH remoto
+├── verify-deployment.sh   # Verificación de despliegue
+├── update-remote.sh       # Actualización remota
+├── ubuntu24-install.sh    # Instalación local Ubuntu
+├── DEPLOY-SSH.md          # Guía de despliegue SSH
 └── README.md              # Documentación
 ```
 
