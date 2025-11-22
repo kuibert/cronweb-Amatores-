@@ -435,12 +435,37 @@ function handleImport(event) {
 
 // Cargar configuración
 function loadConfig() {
+    const savedTheme = localStorage.getItem('cronManagerTheme') || 'light';
+    applyTheme(savedTheme);
+    
     const savedConfig = localStorage.getItem('cronManagerConfig');
     if (savedConfig) {
         const config = JSON.parse(savedConfig);
-        if (config.theme === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
+        document.getElementById('timezone').value = config.timezone || 'America/Mexico_City';
+        document.getElementById('theme').value = config.theme || savedTheme;
+    }
+}
+
+// Alternar tema
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+    localStorage.setItem('cronManagerTheme', newTheme);
+}
+
+// Aplicar tema
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+    
+    // Actualizar select de configuración si existe
+    const themeSelect = document.getElementById('theme');
+    if (themeSelect) {
+        themeSelect.value = theme;
     }
 }
 
@@ -452,12 +477,9 @@ function saveConfig() {
     };
     
     localStorage.setItem('cronManagerConfig', JSON.stringify(config));
+    localStorage.setItem('cronManagerTheme', config.theme);
     
-    if (config.theme === 'dark') {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-    }
+    applyTheme(config.theme);
     
     showAlert('Configuración guardada exitosamente', 'success');
 }

@@ -1,7 +1,41 @@
 /* Estilos personalizados para Amatores Cron Manager */
 
+:root {
+    /* Colores modo claro */
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: rgba(0, 0, 0, 0.125);
+    --shadow: rgba(0, 0, 0, 0.075);
+    --navbar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --table-header-bg: #f8f9fa;
+    --form-bg: #ffffff;
+    --modal-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+    /* Colores modo oscuro */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #404040;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --border-color: #555555;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --navbar-bg: #2d2d2d;
+    --card-bg: #2d2d2d;
+    --table-header-bg: #404040;
+    --form-bg: #404040;
+    --modal-bg: #2d2d2d;
+}
+
 body {
-    background-color: #f8f9fa;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .navbar-brand {
@@ -9,13 +43,26 @@ body {
 }
 
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: var(--card-bg);
+    box-shadow: 0 0.125rem 0.25rem var(--shadow);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.table {
+    color: var(--text-primary);
 }
 
 .table th {
-    background-color: #f8f9fa;
+    background-color: var(--table-header-bg);
     border-top: none;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.table td {
+    border-color: var(--border-color);
+    color: var(--text-primary);
 }
 
 .btn-action {
@@ -32,10 +79,12 @@ body {
 
 .cron-expression {
     font-family: 'Courier New', monospace;
-    background-color: #f8f9fa;
+    background-color: var(--bg-tertiary);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.9em;
+    color: var(--text-primary);
+    transition: background-color 0.3s ease;
 }
 
 .modal-header {
@@ -144,45 +193,96 @@ main {
     z-index: 1000;
 }
 
-/* Tema oscuro */
-.dark-theme {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
+/* Formularios */
+.form-control, .form-select {
+    background-color: var(--form-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-.dark-theme .bg-light {
-    background-color: #2d2d2d !important;
+.form-control:focus, .form-select:focus {
+    background-color: var(--form-bg);
+    border-color: #0d6efd;
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-.dark-theme .card {
-    background-color: #2d2d2d;
-    border-color: #404040;
+/* Navbar */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s ease;
 }
 
-.dark-theme .table {
-    color: #e0e0e0;
+.navbar-brand, .navbar-nav .nav-link {
+    color: var(--text-primary) !important;
+    transition: color 0.3s ease;
 }
 
-.dark-theme .table th {
-    background-color: #404040;
-    border-color: #555;
+/* Botón de tema */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.dark-theme .form-control {
-    background-color: #404040;
-    border-color: #555;
-    color: #e0e0e0;
+.theme-toggle:hover {
+    background-color: var(--bg-tertiary);
+    transform: scale(1.05);
 }
 
-.dark-theme .form-select {
-    background-color: #404040;
-    border-color: #555;
-    color: #e0e0e0;
+/* Modal mejorado */
+.modal-content {
+    background-color: var(--modal-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
-.dark-theme .modal-content {
-    background-color: #2d2d2d;
-    color: #e0e0e0;
+.modal-body {
+    background-color: var(--modal-bg);
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    background-color: var(--modal-bg);
+    border-color: var(--border-color);
+}
+
+/* Elementos Bootstrap que necesitan override */
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .border {
+    border-color: var(--border-color) !important;
+}
+
+/* Alertas */
+[data-theme="dark"] .alert-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    border-color: rgba(13, 202, 240, 0.2);
+    color: #9ec5fe;
+}
+
+[data-theme="dark"] .alert-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    border-color: rgba(25, 135, 84, 0.2);
+    color: #75b798;
+}
+
+[data-theme="dark"] .alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.2);
+    color: #f1aeb5;
 }
 
 /* Mejoras en la tabla */
