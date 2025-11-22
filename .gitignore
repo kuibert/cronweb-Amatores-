@@ -1,6 +1,26 @@
-# Archivos que no deben versionarse
-*.log
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración del IDE
+.vscode/
+.idea/
+
+# Archivos temporales
 *.tmp
-/public/execution_logs.json
-/public/generated_crontab.txt
-/public/current_crontab.txt
+*.temp
+*.log
+
+# Archivos de cron generados
+src/cron_jobs.json
+src/current_crontab.txt
+
+# Archivos de PHP
+*.php~
+
+# Node modules (si se usan en el futuro)
+node_modules/
+
+# Archivos de backup
+*.bak
+*.backup
