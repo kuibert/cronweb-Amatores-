@@ -243,12 +243,24 @@ class CronManager {
             $job = $jobs[$index];
             $command = $job['command'];
             
-            // Ejecutar comando como el usuario Linux específico
-            $fullCommand = sprintf(
-                'sudo -u %s bash -c %s 2>&1',
-                escapeshellarg($this->linuxUser),
-                escapeshellarg($command)
-            );
+            // Ejecutar comando directamente (www-data ya tiene permisos sudo NOPASSWD para crontab)
+            // Para ejecución manual, usar el wrapper del usuario
+            $wrapperPath = '/home/' . $this->linuxUser . '/wrapper_cron.sh';
+            if (file_exists($wrapperPath)) {
+                $fullCommand = sprintf(
+                    'sudo -u %s %s %s 2>&1',
+                    escapeshellarg($this->linuxUser),
+                    escapeshellarg($wrapperPath),
+                    escapeshellarg($command)
+                );
+            } else {
+                // Fallback: ejecutar directamente
+                $fullCommand = sprintf(
+                    'sudo -u %s bash -c %s 2>&1',
+                    escapeshellarg($this->linuxUser),
+                    escapeshellarg($command)
+                );
+            }
             exec($fullCommand, $output, $returnCode);
             
             logAction($this->linuxUser, 'RUN_JOB', $command);
