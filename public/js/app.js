@@ -262,8 +262,7 @@ function displayUnexecutedTasks(unexecutedJobs) {
     section.style.display = 'block';
     container.innerHTML = '';
     
-    unexecutedJobs.forEach((job, index) => {
-        const originalIndex = currentJobs.indexOf(job);
+    unexecutedJobs.forEach((job) => {
         const reason = job.updated_at ? 'Editada - Requiere nueva ejecución' : 'Creada - Nunca ejecutada';
         const statusBadge = job.enabled ? '<span class="badge bg-success">Activa</span>' : '<span class="badge bg-secondary">Inactiva</span>';
         
@@ -282,7 +281,7 @@ function displayUnexecutedTasks(unexecutedJobs) {
                 </small>
             </div>
             <div>
-                <button class="btn btn-sm btn-info" onclick="executeTaskFromDashboard(${originalIndex})" title="Ejecutar ahora">
+                <button class="btn btn-sm btn-info" onclick="executeTaskFromDashboard('${job.id}')" title="Ejecutar ahora">
                     <i class="bi bi-play-fill"></i> Ejecutar
                 </button>
             </div>
@@ -292,7 +291,20 @@ function displayUnexecutedTasks(unexecutedJobs) {
 }
 
 // Ejecutar tarea desde el dashboard
-function executeTaskFromDashboard(index) {
+function executeTaskFromDashboard(jobId) {
+    // Buscar el índice de la tarea por su ID
+    const index = currentJobs.findIndex(job => job.id === jobId);
+    if (index === -1) {
+        // Si no está en currentJobs, recargar y buscar
+        loadCronJobs();
+        setTimeout(() => {
+            const newIndex = currentJobs.findIndex(job => job.id === jobId);
+            if (newIndex !== -1) {
+                runTaskNow(newIndex);
+            }
+        }, 500);
+        return;
+    }
     runTaskNow(index);
     // Actualizar dashboard después de ejecutar
     setTimeout(() => updateDashboard(), 1000);
