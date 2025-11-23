@@ -274,7 +274,7 @@ class CronManager {
     }
     
     public function getLogs() {
-        $logFile = __DIR__ . '/execution_logs.json';
+        $logFile = __DIR__ . '/execution_logs_' . $this->linuxUser . '.json';
         if (!file_exists($logFile)) {
             return [];
         }
@@ -292,7 +292,7 @@ class CronManager {
     }
     
     public function clearLogs() {
-        $logFile = __DIR__ . '/execution_logs.json';
+        $logFile = __DIR__ . '/execution_logs_' . $this->linuxUser . '.json';
         file_put_contents($logFile, json_encode([]));
         return ['success' => true, 'message' => 'Logs limpiados'];
     }
@@ -334,7 +334,7 @@ class CronManager {
     }
     
     private function addLog($command, $status, $output) {
-        $logFile = __DIR__ . '/execution_logs.json';
+        $logFile = __DIR__ . '/execution_logs_' . $this->linuxUser . '.json';
         $logs = [];
         
         if (file_exists($logFile)) {
