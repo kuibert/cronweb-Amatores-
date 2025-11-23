@@ -1,3 +1,7 @@
+<?php
+require_once 'auth.php';
+requireAuth();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,9 +19,18 @@
                 <i class="bi bi-clock-history"></i> Amatores Cron Manager
             </a>
             <div class="d-flex align-items-center">
+                <select class="form-select form-select-sm me-3" id="linuxUserSelector" onchange="changeLinuxUser()" style="width: auto;">
+                    <!-- Se llenará dinámicamente -->
+                </select>
+                <span class="text-white me-3">
+                    <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['username']); ?>
+                </span>
                 <button class="theme-toggle me-3" onclick="toggleTheme()" title="Cambiar tema">
                     <i class="bi bi-moon-fill" id="theme-icon"></i>
                 </button>
+                <a href="logout.php" class="btn btn-sm btn-outline-light me-2" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </a>
                 <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
                     <span class="navbar-toggler-icon"></span>
                 </button>

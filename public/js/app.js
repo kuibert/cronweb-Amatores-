@@ -3,6 +3,8 @@
 // Variables globales
 let currentJobs = [];
 let filteredJobs = [];
+let currentLinuxUser = null;
+let availableLinuxUsers = [];
 
 // Plantillas predefinidas
 const cronTemplates = {
@@ -30,11 +32,50 @@ const cronTemplates = {
 
 // Cargar tareas al iniciar la página
 document.addEventListener('DOMContentLoaded', function() {
-    updateDashboard();
-    loadCronJobs();
+    loadAvailableUsers();
     setupCronValidators();
     loadConfig();
 });
+
+// Cargar usuarios Linux disponibles
+function loadAvailableUsers() {
+    fetch('cron_manager.php?action=get_linux_users')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                availableLinuxUsers = data.users;
+                populateUserSelector();
+                if (availableLinuxUsers.length > 0) {
+                    currentLinuxUser = availableLinuxUsers[0];
+                    updateDashboard();
+                    loadCronJobs();
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Poblar selector de usuarios
+function populateUserSelector() {
+    const selector = document.getElementById('linuxUserSelector');
+    selector.innerHTML = '';
+    availableLinuxUsers.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user;
+        option.textContent = `Usuario: ${user}`;
+        selector.appendChild(option);
+    });
+}
+
+// Cambiar usuario Linux activo
+function changeLinuxUser() {
+    const selector = document.getElementById('linuxUserSelector');
+    currentLinuxUser = selector.value;
+    updateDashboard();
+    loadCronJobs();
+    loadLogs();
+    loadCrontabContent();
+}
 
 // Configurar validadores de cron
 function setupCronValidators() {
@@ -188,7 +229,8 @@ function openNewTaskModal() {
 
 // Función para actualizar dashboard
 function updateDashboard() {
-    fetch('cron_manager.php?action=list')
+    if (!currentLinuxUser) return;
+    fetch(`cron_manager.php?action=list&linux_user=${currentLinuxUser}`)
         .then(response => response.json())
         .then(data => {
             const total = data.length;
@@ -258,7 +300,8 @@ function executeTaskFromDashboard(index) {
 
 // Función para cargar contenido del crontab
 function loadCrontabContent() {
-    fetch('cron_manager.php?action=crontab')
+    if (!currentLinuxUser) return;
+    fetch(`cron_manager.php?action=crontab&linux_user=${currentLinuxUser}`)
         .then(response => response.text())
         .then(data => {
             document.getElementById('crontabContent').textContent = data || 'No hay tareas en el crontab';
@@ -287,7 +330,8 @@ function refreshLogsIfVisible() {
 
 // Función para cargar las tareas cron
 function loadCronJobs() {
-    fetch('cron_manager.php?action=list')
+    if (!currentLinuxUser) return;
+    fetch(`cron_manager.php?action=list&linux_user=${currentLinuxUser}`)
         .then(response => response.json())
         .then(data => {
             currentJobs = data;
@@ -396,7 +440,8 @@ let filteredLogs = [];
 
 // Cargar logs
 function loadLogs() {
-    fetch('cron_manager.php?action=logs')
+    if (!currentLinuxUser) return;
+    fetch(`cron_manager.php?action=logs&linux_user=${currentLinuxUser}`)
         .then(response => response.json())
         .then(data => {
             allLogs = data;
@@ -467,8 +512,11 @@ function displayLogs(logs) {
 
 // Limpiar logs
 function clearLogs() {
+    if (!currentLinuxUser) return;
     if (confirm('¿Estás seguro de que quieres limpiar todos los logs?')) {
-        fetch('cron_manager.php?action=clear_logs', { method: 'POST' })
+        const formData = new FormData();
+        formData.append('linux_user', currentLinuxUser);
+        fetch('cron_manager.php?action=clear_logs', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -483,7 +531,8 @@ function clearLogs() {
 
 // Exportar tareas
 function exportTasks() {
-    fetch('cron_manager.php?action=export')
+    if (!currentLinuxUser) return;
+    fetch(`cron_manager.php?action=export&linux_user=${currentLinuxUser}`)
         .then(response => response.blob())
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
@@ -514,6 +563,7 @@ function handleImport(event) {
             
             const formData = new FormData();
             formData.append('action', 'import');
+            formData.append('linux_user', currentLinuxUser);
             formData.append('data', JSON.stringify(tasks));
 
             fetch('cron_manager.php', {
@@ -607,6 +657,7 @@ function saveCronJob() {
 
     const formData = new FormData();
     formData.append('action', 'add');
+    formData.append('linux_user', currentLinuxUser);
     formData.append('data', JSON.stringify(cronData));
     
     fetch('cron_manager.php', {
@@ -640,6 +691,7 @@ function runTaskNow(index) {
     if (confirm(`¿Ejecutar la tarea ahora?\n\nComando: ${job.command}`)) {
         const formData = new FormData();
         formData.append('action', 'run');
+        formData.append('linux_user', currentLinuxUser);
         formData.append('index', index);
 
         fetch('cron_manager.php', {
@@ -671,6 +723,7 @@ function toggleCronJob(index) {
     if (confirm(`¿Deseas ${action} esta tarea?\n\nComando: ${job.command}`)) {
         const formData = new FormData();
         formData.append('action', 'toggle');
+        formData.append('linux_user', currentLinuxUser);
         formData.append('index', index);
 
         fetch('cron_manager.php', {
@@ -731,6 +784,7 @@ function updateCronJob() {
 
     const formData = new FormData();
     formData.append('action', 'edit');
+    formData.append('linux_user', currentLinuxUser);
     formData.append('index', index);
     formData.append('data', JSON.stringify(cronData));
 
@@ -763,6 +817,7 @@ function deleteCronJob(index) {
     if (confirm(confirmMessage)) {
         const formData = new FormData();
         formData.append('action', 'delete');
+        formData.append('linux_user', currentLinuxUser);
         formData.append('index', index);
 
         fetch('cron_manager.php', {
