@@ -13,11 +13,11 @@ $webUsers = [
         'allowed_linux_users' => ['melvin', 'raul']
     ],
     'melvin' => [
-        'password' => password_hash('melvin123', PASSWORD_DEFAULT),
+        'password' => password_hash('Soloyolase01', PASSWORD_DEFAULT),
         'allowed_linux_users' => ['melvin']
     ],
     'raul' => [
-        'password' => password_hash('raul123', PASSWORD_DEFAULT),
+        'password' => password_hash('Soloyolase02', PASSWORD_DEFAULT),
         'allowed_linux_users' => ['raul']
     ]
 ];

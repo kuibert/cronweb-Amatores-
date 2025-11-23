@@ -3,7 +3,7 @@ require_once 'auth.php';
 
 // Si ya está autenticado, redirigir al dashboard
 if (isAuthenticated()) {
-    header('Location: index.html');
+    header('Location: index.php');
     exit;
 }
 
@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     
     if (authenticate($username, $password)) {
-        header('Location: index.html');
+        header('Location: index.php');
         exit;
     } else {
         $error = 'Usuario o contraseña incorrectos';
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="text-center">
                 <small class="text-muted">
                     <strong>Usuarios de prueba:</strong><br>
-                    admin/admin123 | melvin/melvin123 | raul/raul123
+                    admin/admin123 | melvin/Soloyolase01 | raul/Soloyolase02
                 </small>
             </div>
         </div>
