@@ -377,7 +377,8 @@ class CronManager {
         foreach ($jobs as $job) {
             if ($job['enabled']) {
                 $comment = !empty($job['description']) ? " # " . $job['description'] : "";
-                $cronContent .= $job['schedule'] . " " . $job['command'] . $comment . "\n";
+                $wrapperPath = "/home/{$this->linuxUser}/wrapper_cron.sh";
+                $cronContent .= $job['schedule'] . " " . $wrapperPath . " '" . $job['command'] . "'" . $comment . "\n";
             }
         }
         
