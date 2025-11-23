@@ -19,11 +19,11 @@ Cuando se solicite, establecer una contraseña segura.
 ## Paso 2: Copiar Scripts Necesarios
 
 ```bash
-# Copiar wrapper_cron.sh
-sudo cp /home/melvin/wrapper_cron.sh /home/carlos/
+# Copiar wrapper_cron.sh desde el directorio de scripts
+sudo cp /home/melvin/cronweb_scripts/wrapper_cron.sh /home/carlos/
 
-# Copiar cron_logger.php
-sudo cp /home/melvin/cron_logger.php /home/carlos/
+# Copiar cron_logger.php desde el directorio de scripts
+sudo cp /home/melvin/cronweb_scripts/cron_logger.php /home/carlos/
 
 # Establecer permisos correctos
 sudo chown carlos:carlos /home/carlos/wrapper_cron.sh
@@ -184,9 +184,9 @@ El nuevo usuario "carlos" ya puede:
 # 1. Crear usuario
 sudo adduser carlos
 
-# 2. Copiar scripts
-sudo cp /home/melvin/wrapper_cron.sh /home/carlos/
-sudo cp /home/melvin/cron_logger.php /home/carlos/
+# 2. Copiar scripts desde cronweb_scripts/
+sudo cp /home/melvin/cronweb_scripts/wrapper_cron.sh /home/carlos/
+sudo cp /home/melvin/cronweb_scripts/cron_logger.php /home/carlos/
 sudo chown carlos:carlos /home/carlos/wrapper_cron.sh /home/carlos/cron_logger.php
 sudo chmod +x /home/carlos/wrapper_cron.sh /home/carlos/cron_logger.php
 

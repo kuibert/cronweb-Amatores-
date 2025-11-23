@@ -108,9 +108,17 @@ cronweb_project/
 ### Archivos del Sistema
 ```
 /home/melvin/
-├── wrapper_cron.sh            # Script wrapper para ejecutar comandos
-├── cron_logger.php            # Script para registrar logs
-└── cronweb_manager.sh         # Script de gestión (backup/deploy/rollback)
+├── cronweb_scripts/           # Directorio de scripts esenciales
+│   ├── wrapper_cron.sh        # Script wrapper para ejecutar comandos
+│   ├── cron_logger.php        # Script para registrar logs
+│   └── cronweb_manager.sh     # Script de gestión (backup/deploy/rollback)
+├── wrapper_cron.sh            # Enlace simbólico → cronweb_scripts/
+├── cron_logger.php            # Enlace simbólico → cronweb_scripts/
+├── cronweb_manager.sh         # Enlace simbólico → cronweb_scripts/
+├── cronweb_backups/           # Backups (5 más recientes)
+│   └── cronweb_backup_*/
+├── cronweb_docs/              # Documentación adicional
+└── ESTRUCTURA.md              # Mapa de la estructura
 
 /home/raul/
 ├── wrapper_cron.sh            # Script wrapper para raul
@@ -121,9 +129,6 @@ cronweb_project/
 
 /var/log/cronweb/
 └── audit.log                  # Log de auditoría del sistema
-
-/home/melvin/cronweb_backups/  # Directorio de backups
-└── cronweb_backup_YYYYMMDD_HHMMSS/
 ```
 
 ### Flujo de Datos
@@ -180,8 +185,8 @@ sudo chmod 755 /var/log/cronweb
 
 ### 5. Copiar Scripts al Home de Raul
 ```bash
-sudo cp /home/melvin/wrapper_cron.sh /home/raul/
-sudo cp /home/melvin/cron_logger.php /home/raul/
+sudo cp /home/melvin/cronweb_scripts/wrapper_cron.sh /home/raul/
+sudo cp /home/melvin/cronweb_scripts/cron_logger.php /home/raul/
 sudo chown raul:raul /home/raul/wrapper_cron.sh /home/raul/cron_logger.php
 sudo chmod +x /home/raul/wrapper_cron.sh /home/raul/cron_logger.php
 ```
@@ -334,8 +339,8 @@ sudo adduser carlos
 
 #### 2. Copiar Scripts Necesarios
 ```bash
-sudo cp /home/melvin/wrapper_cron.sh /home/carlos/
-sudo cp /home/melvin/cron_logger.php /home/carlos/
+sudo cp /home/melvin/cronweb_scripts/wrapper_cron.sh /home/carlos/
+sudo cp /home/melvin/cronweb_scripts/cron_logger.php /home/carlos/
 sudo chown carlos:carlos /home/carlos/wrapper_cron.sh /home/carlos/cron_logger.php
 sudo chmod +x /home/carlos/wrapper_cron.sh /home/carlos/cron_logger.php
 ```
