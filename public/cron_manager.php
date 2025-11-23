@@ -382,9 +382,10 @@ class CronManager {
             }
         }
         
-        // Guardar en archivo temporal
+        // Guardar en archivo temporal con permisos correctos
         $tempFile = tempnam(sys_get_temp_dir(), 'cron');
         file_put_contents($tempFile, $cronContent);
+        chmod($tempFile, 0644); // Dar permisos de lectura
         
         // Aplicar al crontab del usuario específico usando sudo
         if (PHP_OS_FAMILY === 'Linux') {
@@ -405,8 +406,9 @@ class CronManager {
         
         unlink($tempFile);
         
-        // Guardar copia para visualización
-        file_put_contents(__DIR__ . '/current_crontab_' . $this->linuxUser . '.txt', $cronContent);
+        // Guardar copia para visualización (opcional, con manejo de errores)
+        $copyFile = __DIR__ . '/current_crontab_' . $this->linuxUser . '.txt';
+        @file_put_contents($copyFile, $cronContent);
     }
 }
 
