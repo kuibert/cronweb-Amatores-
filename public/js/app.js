@@ -233,6 +233,9 @@ function updateDashboard() {
     fetch(`cron_manager.php?action=list&linux_user=${currentLinuxUser}`)
         .then(response => response.json())
         .then(data => {
+            // Actualizar currentJobs para que displayUnexecutedTasks tenga datos correctos
+            currentJobs = data;
+            
             const total = data.length;
             const active = data.filter(job => job.enabled).length;
             const inactive = total - active;
