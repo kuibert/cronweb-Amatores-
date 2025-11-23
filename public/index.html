@@ -72,7 +72,7 @@
                 <div id="dashboard-section" class="content-section">
                     <h1 class="mb-4">Dashboard</h1>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <i class="bi bi-list-task fs-1 text-primary"></i>
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <i class="bi bi-play-circle fs-1 text-success"></i>
@@ -90,12 +90,38 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card text-center">
                                 <div class="card-body">
                                     <i class="bi bi-pause-circle fs-1 text-warning"></i>
                                     <h5 class="card-title mt-2">Inactivas</h5>
                                     <h2 id="inactiveTasks" class="text-warning">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-hourglass-split fs-1 text-info"></i>
+                                    <h5 class="card-title mt-2">Sin Ejecutar</h5>
+                                    <h2 id="unexecutedTasks" class="text-info">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de tareas sin ejecutar -->
+                    <div class="row mt-4" id="unexecutedTasksSection" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Tareas Sin Ejecutar</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">Estas tareas necesitan ser ejecutadas para validar su funcionamiento:</p>
+                                    <div id="unexecutedTasksList" class="list-group">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -185,8 +211,11 @@
                 <div id="crontab-section" class="content-section" style="display: none;">
                     <h1 class="mb-4">Crontab Actual</h1>
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Contenido del Crontab</h5>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadCrontabContent()">
+                                <i class="bi bi-arrow-clockwise"></i> Refrescar
+                            </button>
                         </div>
                         <div class="card-body">
                             <pre id="crontabContent" class="bg-dark text-light p-3 rounded">Cargando...</pre>
@@ -197,22 +226,42 @@
                 <!-- Logs -->
                 <div id="logs-section" class="content-section" style="display: none;">
                     <h1 class="mb-4">Logs de Ejecución</h1>
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Historial de Ejecuciones</h5>
+                    
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="logStatusFilter" onchange="filterLogs()">
+                                <option value="all">Todos los estados</option>
+                                <option value="success">Solo éxitos</option>
+                                <option value="error">Solo errores</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="logSearchInput" placeholder="Buscar en comando o salida..." onkeyup="filterLogs()">
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="loadLogs()">
+                                <i class="bi bi-arrow-clockwise"></i> Refrescar
+                            </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="clearLogs()">
                                 <i class="bi bi-trash"></i> Limpiar Logs
                             </button>
                         </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Historial de Ejecuciones (Últimos 50 registros)</h5>
+                        </div>
                         <div class="card-body">
                             <div id="logsContainer" class="table-responsive">
-                                <table class="table table-sm">
+                                <table class="table table-sm table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Fecha/Hora</th>
-                                            <th>Tarea</th>
-                                            <th>Estado</th>
-                                            <th>Salida</th>
+                                            <th style="width: 15%">Fecha/Hora</th>
+                                            <th style="width: 35%">Tarea</th>
+                                            <th style="width: 10%">Estado</th>
+                                            <th style="width: 40%">Salida</th>
                                         </tr>
                                     </thead>
                                     <tbody id="logsTableBody">

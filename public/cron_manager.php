@@ -143,7 +143,8 @@ class CronManager {
             // Actualizar crontab real
             $this->updateSystemCrontab();
             
-            return ['success' => true, 'message' => 'Estado actualizado'];
+            $message = $jobs[$index]['enabled'] ? 'Tarea habilitada en crontab' : 'Tarea deshabilitada';
+            return ['success' => true, 'message' => $message];
         } catch (Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
@@ -169,12 +170,16 @@ class CronManager {
             );
             $jobs[$index]['updated_at'] = date('Y-m-d H:i:s');
             
+            // Marcar como pendiente al editar
+            unset($jobs[$index]['last_execution']);
+            unset($jobs[$index]['last_status']);
+            
             $this->saveJobs($jobs);
             
             // Actualizar crontab real
             $this->updateSystemCrontab();
             
-            return ['success' => true, 'message' => 'Tarea actualizada exitosamente'];
+            return ['success' => true, 'message' => 'Tarea actualizada y marcada como pendiente'];
         } catch (Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }
@@ -421,18 +426,35 @@ switch ($action) {
         break;
         
     case 'crontab':
-        // Obtener crontab real en Linux
-        if (PHP_OS_FAMILY === 'Linux') {
-            exec('crontab -l 2>/dev/null', $output, $returnCode);
-            if ($returnCode === 0) {
-                echo implode("\n", $output);
-            } else {
-                echo 'No hay tareas en el crontab';
+        // Obtener crontab con información de ejecución
+        $jobs = $cronManager->loadJobs();
+        $cronLines = [];
+        
+        $cronLines[] = "# Amatores Cron Manager - Tareas generadas automáticamente";
+        $cronLines[] = "";
+        
+        foreach ($jobs as $job) {
+            if ($job['enabled']) {
+                $line = $job['schedule'] . " " . $job['command'];
+                
+                // Agregar información de ejecución
+                if (isset($job['last_execution'])) {
+                    $status = $job['last_status'] ?? 'pending';
+                    $statusIcon = $status === 'success' ? '✅' : ($status === 'error' ? '❌' : '⏳');
+                    $line .= " # " . ($job['description'] ?: 'Sin descripción');
+                    $line .= " | Última ejecución: " . $job['last_execution'] . " " . $statusIcon;
+                } else {
+                    $line .= " # " . ($job['description'] ?: 'Sin descripción') . " | ⏳ Nunca ejecutada";
+                }
+                
+                $cronLines[] = $line;
             }
+        }
+        
+        if (count($cronLines) <= 2) {
+            echo 'No hay tareas en el crontab';
         } else {
-            // Fallback para desarrollo
-            $content = file_get_contents(__DIR__ . '/current_crontab.txt');
-            echo $content ?: 'No hay tareas en el crontab';
+            echo implode("\n", $cronLines);
         }
         break;
         

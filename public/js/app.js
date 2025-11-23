@@ -30,8 +30,8 @@ const cronTemplates = {
 
 // Cargar tareas al iniciar la página
 document.addEventListener('DOMContentLoaded', function() {
-    loadCronJobs();
     updateDashboard();
+    loadCronJobs();
     setupCronValidators();
     loadConfig();
 });
@@ -194,12 +194,66 @@ function updateDashboard() {
             const total = data.length;
             const active = data.filter(job => job.enabled).length;
             const inactive = total - active;
+            const unexecuted = data.filter(job => !job.last_execution).length;
             
             document.getElementById('totalTasks').textContent = total;
             document.getElementById('activeTasks').textContent = active;
             document.getElementById('inactiveTasks').textContent = inactive;
+            document.getElementById('unexecutedTasks').textContent = unexecuted;
+            
+            // Mostrar lista de tareas sin ejecutar
+            displayUnexecutedTasks(data.filter(job => !job.last_execution));
         })
         .catch(error => console.error('Error:', error));
+}
+
+// Mostrar tareas sin ejecutar en el dashboard
+function displayUnexecutedTasks(unexecutedJobs) {
+    const section = document.getElementById('unexecutedTasksSection');
+    const container = document.getElementById('unexecutedTasksList');
+    
+    if (unexecutedJobs.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    section.style.display = 'block';
+    container.innerHTML = '';
+    
+    unexecutedJobs.forEach((job, index) => {
+        const originalIndex = currentJobs.indexOf(job);
+        const reason = job.updated_at ? 'Editada - Requiere nueva ejecución' : 'Creada - Nunca ejecutada';
+        const statusBadge = job.enabled ? '<span class="badge bg-success">Activa</span>' : '<span class="badge bg-secondary">Inactiva</span>';
+        
+        const item = document.createElement('div');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start';
+        item.innerHTML = `
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-1">
+                    <strong class="me-2">${job.description || 'Sin descripción'}</strong>
+                    ${statusBadge}
+                </div>
+                <code class="text-muted" style="font-size: 0.85em">${job.command}</code><br>
+                <small class="text-muted">
+                    <i class="bi bi-clock"></i> ${job.schedule} | 
+                    <i class="bi bi-info-circle"></i> ${reason}
+                </small>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-info" onclick="executeTaskFromDashboard(${originalIndex})" title="Ejecutar ahora">
+                    <i class="bi bi-play-fill"></i> Ejecutar
+                </button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+// Ejecutar tarea desde el dashboard
+function executeTaskFromDashboard(index) {
+    runTaskNow(index);
+    // Actualizar dashboard después de ejecutar
+    setTimeout(() => updateDashboard(), 1000);
 }
 
 // Función para cargar contenido del crontab
@@ -220,6 +274,14 @@ function refreshCrontabIfVisible() {
     const crontabSection = document.getElementById('crontab-section');
     if (crontabSection && crontabSection.style.display !== 'none') {
         setTimeout(() => loadCrontabContent(), 500);
+    }
+}
+
+// Función para refrescar logs después de cambios
+function refreshLogsIfVisible() {
+    const logsSection = document.getElementById('logs-section');
+    if (logsSection && logsSection.style.display !== 'none') {
+        setTimeout(() => loadLogs(), 500);
     }
 }
 
@@ -253,7 +315,13 @@ function displayCronJobs(jobs) {
         const lastExecution = job.last_execution || 'Nunca';
         const executionStatus = job.last_status || 'pending';
         
+        // Determinar estado simple
+        const isPending = !job.last_execution;
+        const statusBadgeClass = executionStatus === 'success' ? 'success' : executionStatus === 'error' ? 'danger' : 'info';
+        const statusText = executionStatus === 'success' ? '✅ Éxito' : executionStatus === 'error' ? '❌ Error' : '⏳ Sin ejecutar';
+        
         const row = document.createElement('tr');
+        row.className = isPending ? 'table-info' : '';
         row.innerHTML = `
             <td>
                 <span class="badge ${job.enabled ? 'bg-success' : 'bg-secondary'}">
@@ -265,8 +333,8 @@ function displayCronJobs(jobs) {
             <td>${job.description || 'Sin descripción'}</td>
             <td>
                 <small class="text-muted">${lastExecution}</small><br>
-                <span class="badge bg-${executionStatus === 'success' ? 'success' : executionStatus === 'error' ? 'danger' : 'secondary'}">
-                    ${executionStatus === 'success' ? 'Éxito' : executionStatus === 'error' ? 'Error' : 'Pendiente'}
+                <span class="badge bg-${statusBadgeClass}">
+                    ${statusText}
                 </span>
             </td>
             <td>
@@ -278,8 +346,8 @@ function displayCronJobs(jobs) {
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-outline-${job.enabled ? 'warning' : 'success'}" 
-                            onclick="toggleCronJob(${originalIndex})" title="${job.enabled ? 'Desactivar' : 'Activar'}">
-                        <i class="bi bi-${job.enabled ? 'pause' : 'play'}"></i>
+                            onclick="toggleCronJob(${originalIndex})" title="${job.enabled ? 'Desactivar' : 'Habilitar'}">
+                        <i class="bi bi-${job.enabled ? 'pause' : 'play-circle'}"></i>
                     </button>
                     <button class="btn btn-outline-danger" onclick="deleteCronJob(${originalIndex})" title="Eliminar">
                         <i class="bi bi-trash"></i>
@@ -310,7 +378,7 @@ function runTaskNow(index) {
             if (data.success) {
                 showAlert('Tarea ejecutada. Resultado: ' + (data.output || 'Sin salida'), 'success');
                 loadCronJobs();
-                loadLogs();
+                refreshLogsIfVisible();
             } else {
                 showAlert('Error al ejecutar la tarea: ' + data.message, 'danger');
             }
@@ -322,17 +390,39 @@ function runTaskNow(index) {
     }
 }
 
+// Variables globales para logs
+let allLogs = [];
+let filteredLogs = [];
+
 // Cargar logs
 function loadLogs() {
     fetch('cron_manager.php?action=logs')
         .then(response => response.json())
         .then(data => {
-            displayLogs(data);
+            allLogs = data;
+            filterLogs();
         })
         .catch(error => {
             console.error('Error:', error);
             showAlert('Error al cargar los logs', 'danger');
         });
+}
+
+// Filtrar logs
+function filterLogs() {
+    const statusFilter = document.getElementById('logStatusFilter')?.value || 'all';
+    const searchTerm = document.getElementById('logSearchInput')?.value.toLowerCase() || '';
+    
+    filteredLogs = allLogs.filter(log => {
+        const matchesStatus = statusFilter === 'all' || log.status === statusFilter;
+        const matchesSearch = !searchTerm || 
+                            log.command.toLowerCase().includes(searchTerm) ||
+                            (log.output && log.output.toLowerCase().includes(searchTerm));
+        
+        return matchesStatus && matchesSearch;
+    });
+    
+    displayLogs(filteredLogs);
 }
 
 // Mostrar logs
@@ -341,21 +431,35 @@ function displayLogs(logs) {
     tbody.innerHTML = '';
 
     if (logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay logs disponibles</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay logs que coincidan con los filtros</td></tr>';
         return;
     }
 
-    logs.forEach(log => {
+    // Limitar a 50 logs
+    const displayLogs = logs.slice(0, 50);
+    
+    displayLogs.forEach(log => {
+        // Buscar la tarea correspondiente para obtener la descripción
+        const task = currentJobs.find(job => job.command === log.command);
+        const description = task?.description || '';
+        
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><small>${log.timestamp}</small></td>
-            <td><code>${log.command}</code></td>
+            <td><small class="text-muted">${log.timestamp}</small></td>
+            <td>
+                ${description ? `<strong>${description}</strong><br>` : ''}
+                <code class="text-muted" style="font-size: 0.85em">${log.command}</code>
+            </td>
             <td>
                 <span class="badge bg-${log.status === 'success' ? 'success' : 'danger'}">
-                    ${log.status === 'success' ? 'Éxito' : 'Error'}
+                    ${log.status === 'success' ? '✅ Éxito' : '❌ Error'}
                 </span>
             </td>
-            <td><small>${log.output || 'Sin salida'}</small></td>
+            <td>
+                <small class="${log.status === 'success' ? 'text-muted' : 'text-danger'}">
+                    ${log.output ? (log.output.length > 100 ? log.output.substring(0, 100) + '...' : log.output) : 'Sin salida'}
+                </small>
+            </td>
         `;
         tbody.appendChild(row);
     });
@@ -528,30 +632,68 @@ function saveCronJob() {
     });
 }
 
-function toggleCronJob(index) {
-    const formData = new FormData();
-    formData.append('action', 'toggle');
-    formData.append('index', index);
+// Ejecutar tarea manualmente (sin cambiar estado enabled)
+function runTaskNow(index) {
+    const job = currentJobs[index];
+    if (!job) return;
+    
+    if (confirm(`¿Ejecutar la tarea ahora?\n\nComando: ${job.command}`)) {
+        const formData = new FormData();
+        formData.append('action', 'run');
+        formData.append('index', index);
 
-    fetch('cron_manager.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showAlert('Estado de la tarea actualizado', 'success');
-            loadCronJobs();
-            updateDashboard();
-            refreshCrontabIfVisible();
-        } else {
+        fetch('cron_manager.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Tarea ejecutada. Resultado: ' + (data.output || 'Sin salida'), 'success');
+                loadCronJobs();
+                updateDashboard();
+                refreshLogsIfVisible();
+            } else {
+                showAlert('Error al ejecutar la tarea: ' + data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error al ejecutar la tarea', 'danger');
+        });
+    }
+}
+
+function toggleCronJob(index) {
+    const job = currentJobs[index];
+    const action = job.enabled ? 'deshabilitar' : 'habilitar';
+    
+    if (confirm(`¿Deseas ${action} esta tarea?\n\nComando: ${job.command}`)) {
+        const formData = new FormData();
+        formData.append('action', 'toggle');
+        formData.append('index', index);
+
+        fetch('cron_manager.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                loadCronJobs();
+                updateDashboard();
+                refreshCrontabIfVisible();
+                refreshLogsIfVisible();
+            } else {
+                showAlert('Error: ' + data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
             showAlert('Error al actualizar la tarea', 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('Error al actualizar la tarea', 'danger');
-    });
+        });
+    }
 }
 
 function editCronJob(index) {
