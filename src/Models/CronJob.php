@@ -59,8 +59,8 @@ class CronJob {
     public function setSchedule(string $schedule): void { $this->schedule = $schedule; }
     public function setEnabled(bool $enabled): void { $this->enabled = $enabled; }
     public function setUpdatedAt(string $updatedAt): void { $this->updatedAt = $updatedAt; }
-    public function setLastExecution(string $lastExecution): void { $this->lastExecution = $lastExecution; }
-    public function setLastStatus(string $lastStatus): void { $this->lastStatus = $lastStatus; }
+    public function setLastExecution(?string $lastExecution): void { $this->lastExecution = $lastExecution; }
+    public function setLastStatus(?string $lastStatus): void { $this->lastStatus = $lastStatus; }
     
     public function toggle(): void {
         $this->enabled = !$this->enabled;

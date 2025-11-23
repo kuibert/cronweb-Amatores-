@@ -3,7 +3,7 @@
  */
 
 const ApiClient = {
-    baseUrl: 'cron_manager_v2.php',
+    baseUrl: 'cron_manager.php',
     
     async request(action, data = {}, method = 'GET') {
         const url = new URL(this.baseUrl, window.location.origin + window.location.pathname.replace(/[^/]*$/, ''));

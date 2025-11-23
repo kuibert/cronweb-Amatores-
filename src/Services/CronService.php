@@ -82,6 +82,8 @@ class CronService {
         $jobs[$index]->setDescription($data['description'] ?? '');
         $jobs[$index]->setSchedule($schedule);
         $jobs[$index]->setUpdatedAt(date('Y-m-d H:i:s'));
+        $jobs[$index]->setLastExecution(null);
+        $jobs[$index]->setLastStatus(null);
         
         $this->saveJobs($jobs);
         $this->executor->updateSystemCrontab($jobs);

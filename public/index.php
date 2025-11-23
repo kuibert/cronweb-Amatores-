@@ -216,6 +216,11 @@ requireAuth();
                                     </tbody>
                                 </table>
                             </div>
+                            <nav class="mt-3" id="tasksPagination">
+                                <ul class="pagination justify-content-center" id="paginationList">
+                                </ul>
+                            </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -281,6 +286,11 @@ requireAuth();
                                         <!-- Logs se cargarán aquí -->
                                     </tbody>
                                 </table>
+                            </div>
+                            <nav class="mt-3" id="tasksPagination">
+                                <ul class="pagination justify-content-center" id="paginationList">
+                                </ul>
+                            </nav>
                             </div>
                         </div>
                     </div>
@@ -468,6 +478,11 @@ requireAuth();
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Módulos v2 -->
+    <script src="js/modules/api-client.js"></script>
+    <script src="js/modules/validators.js"></script>
+    <script src="js/modules/ui-manager.js"></script>
+    <script src="js/modules/templates.js"></script>
+    <script src="js/app-v2.js"></script>
 </body>
 </html>
