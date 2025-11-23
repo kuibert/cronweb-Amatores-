@@ -1,8 +1,11 @@
 <?php
 /**
- * Amatores Cron Manager - Backend PHP
- * Gestiona las operaciones de crontab
+ * Amatores Cron Manager - Backend PHP Multi-Usuario
+ * Gestiona las operaciones de crontab para múltiples usuarios Linux
  */
+
+require_once 'auth.php';
+requireAuth(); // Proteger todas las peticiones
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -11,10 +14,25 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 class CronManager {
     private $cronFile;
+    private $linuxUser;
     
-    public function __construct() {
-        // Archivo temporal para almacenar las tareas cron
-        $this->cronFile = __DIR__ . '/cron_jobs.json';
+    public function __construct($linuxUser = null) {
+        // Validar y establecer usuario Linux
+        if ($linuxUser) {
+            validateLinuxUser($linuxUser);
+            
+            // Verificar permisos
+            if (!canAccessLinuxUser($_SESSION['username'], $linuxUser)) {
+                throw new Exception('No tienes permiso para acceder a este usuario');
+            }
+            
+            $this->linuxUser = $linuxUser;
+        } else {
+            $this->linuxUser = 'melvin'; // Usuario por defecto
+        }
+        
+        // Archivo JSON por usuario
+        $this->cronFile = __DIR__ . '/cron_jobs_' . $this->linuxUser . '.json';
         
         // Crear archivo si no existe
         if (!file_exists($this->cronFile)) {
@@ -225,8 +243,15 @@ class CronManager {
             $job = $jobs[$index];
             $command = $job['command'];
             
-            // Ejecutar comando
-            exec($command . ' 2>&1', $output, $returnCode);
+            // Ejecutar comando como el usuario Linux específico
+            $fullCommand = sprintf(
+                'sudo -u %s bash -c %s 2>&1',
+                escapeshellarg($this->linuxUser),
+                escapeshellarg($command)
+            );
+            exec($fullCommand, $output, $returnCode);
+            
+            logAction($this->linuxUser, 'RUN_JOB', $command);
             
             $result = [
                 'success' => $returnCode === 0,
@@ -335,6 +360,7 @@ class CronManager {
     private function updateSystemCrontab() {
         $jobs = $this->loadJobs();
         $cronContent = "# Amatores Cron Manager - Tareas generadas automáticamente\n";
+        $cronContent .= "# Usuario: " . $this->linuxUser . "\n";
         
         foreach ($jobs as $job) {
             if ($job['enabled']) {
@@ -347,23 +373,50 @@ class CronManager {
         $tempFile = tempnam(sys_get_temp_dir(), 'cron');
         file_put_contents($tempFile, $cronContent);
         
-        // Aplicar al crontab real en Linux
+        // Aplicar al crontab del usuario específico usando sudo
         if (PHP_OS_FAMILY === 'Linux') {
-            exec("crontab $tempFile 2>&1", $output, $returnCode);
+            $command = sprintf(
+                'sudo -u %s crontab %s 2>&1',
+                escapeshellarg($this->linuxUser),
+                escapeshellarg($tempFile)
+            );
+            exec($command, $output, $returnCode);
+            
             if ($returnCode !== 0) {
-                error_log("Error updating crontab: " . implode("\n", $output));
+                error_log("Error updating crontab for {$this->linuxUser}: " . implode("\n", $output));
+                logAction($this->linuxUser, 'CRONTAB_UPDATE_ERROR', implode(', ', $output));
+            } else {
+                logAction($this->linuxUser, 'CRONTAB_UPDATED', 'Crontab actualizado exitosamente');
             }
         }
         
         unlink($tempFile);
         
         // Guardar copia para visualización
-        file_put_contents(__DIR__ . '/current_crontab.txt', $cronContent);
+        file_put_contents(__DIR__ . '/current_crontab_' . $this->linuxUser . '.txt', $cronContent);
     }
 }
 
-// Procesar la solicitud
-$cronManager = new CronManager();
+// Obtener usuario Linux de la petición
+$linuxUser = $_GET['linux_user'] ?? $_POST['linux_user'] ?? $_SESSION['current_linux_user'] ?? null;
+
+// Si no hay usuario, obtener el primero permitido
+if (!$linuxUser) {
+    $allowed = getAllowedLinuxUsers();
+    $linuxUser = $allowed[0] ?? 'melvin';
+}
+
+// Guardar en sesión
+$_SESSION['current_linux_user'] = $linuxUser;
+
+try {
+    $cronManager = new CronManager($linuxUser);
+} catch (Exception $e) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    exit;
+}
+
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 switch ($action) {
@@ -431,6 +484,7 @@ switch ($action) {
         $cronLines = [];
         
         $cronLines[] = "# Amatores Cron Manager - Tareas generadas automáticamente";
+        $cronLines[] = "# Usuario Linux: " . $linuxUser;
         $cronLines[] = "";
         
         foreach ($jobs as $job) {
@@ -451,11 +505,20 @@ switch ($action) {
             }
         }
         
-        if (count($cronLines) <= 2) {
+        if (count($cronLines) <= 3) {
             echo 'No hay tareas en el crontab';
         } else {
             echo implode("\n", $cronLines);
         }
+        break;
+    
+    case 'get_linux_users':
+        // Obtener usuarios Linux permitidos para el usuario web actual
+        echo json_encode([
+            'success' => true,
+            'users' => getAllowedLinuxUsers(),
+            'current' => $linuxUser
+        ]);
         break;
         
     default:
