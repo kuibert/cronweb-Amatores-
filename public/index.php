@@ -1,0 +1,473 @@
+<?php
+require_once 'auth.php';
+requireAuth();
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amatores - Planificador de Tareas Cron</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-clock-history"></i> Amatores Cron Manager
+            </a>
+            <div class="d-flex align-items-center">
+                <select class="form-select form-select-sm me-3" id="linuxUserSelector" onchange="changeLinuxUser()" style="width: auto;">
+                    <!-- Se llenará dinámicamente -->
+                </select>
+                <span class="text-white me-3">
+                    <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['username']); ?>
+                </span>
+                <button class="theme-toggle me-3" onclick="toggleTheme()" title="Cambiar tema">
+                    <i class="bi bi-moon-fill" id="theme-icon"></i>
+                </button>
+                <a href="logout.php" class="btn btn-sm btn-outline-light me-2" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </a>
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('tasks')">
+                                <i class="bi bi-list-task"></i> Listar Tareas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="openNewTaskModal()">
+                                <i class="bi bi-plus-circle"></i> Nueva Tarea
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('crontab')">
+                                <i class="bi bi-file-text"></i> Ver Crontab
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('logs')">
+                                <i class="bi bi-journal-text"></i> Logs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('config')">
+                                <i class="bi bi-gear"></i> Configuración
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="pt-3">
+                <!-- Dashboard -->
+                <div id="dashboard-section" class="content-section">
+                    <h1 class="mb-4">Dashboard</h1>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-list-task fs-1 text-primary"></i>
+                                    <h5 class="card-title mt-2">Total Tareas</h5>
+                                    <h2 id="totalTasks" class="text-primary">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-play-circle fs-1 text-success"></i>
+                                    <h5 class="card-title mt-2">Activas</h5>
+                                    <h2 id="activeTasks" class="text-success">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-pause-circle fs-1 text-warning"></i>
+                                    <h5 class="card-title mt-2">Inactivas</h5>
+                                    <h2 id="inactiveTasks" class="text-warning">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="bi bi-hourglass-split fs-1 text-info"></i>
+                                    <h5 class="card-title mt-2">Sin Ejecutar</h5>
+                                    <h2 id="unexecutedTasks" class="text-info">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de tareas sin ejecutar -->
+                    <div class="row mt-4" id="unexecutedTasksSection" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Tareas Sin Ejecutar</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">Estas tareas necesitan ser ejecutadas para validar su funcionamiento:</p>
+                                    <div id="unexecutedTasksList" class="list-group">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas -->
+                <div id="tasks-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Administrar Cron Jobs</h1>
+                
+                    <!-- Barra de herramientas -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Buscar tareas..." onkeyup="filterTasks()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="statusFilter" onchange="filterTasks()">
+                                <option value="all">Todas las tareas</option>
+                                <option value="active">Solo activas</option>
+                                <option value="inactive">Solo inactivas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 text-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportTasks()" title="Exportar">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="importTasks()" title="Importar">
+                                    <i class="bi bi-upload"></i>
+                                </button>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newTaskModal">
+                                    <i class="bi bi-plus-circle"></i> Nueva Tarea
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Plantillas rápidas -->
+                    <div class="mb-3">
+                        <small class="text-muted">Plantillas rápidas:</small><br>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="useTemplate('daily')">
+                                <i class="bi bi-calendar-day"></i> Diario
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="useTemplate('weekly')">
+                                <i class="bi bi-calendar-week"></i> Semanal
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="useTemplate('monthly')">
+                                <i class="bi bi-calendar-month"></i> Mensual
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="useTemplate('backup')">
+                                <i class="bi bi-archive"></i> Backup
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Tareas Programadas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="cronTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Estado</th>
+                                            <th>Comando</th>
+                                            <th>Programación</th>
+                                            <th>Descripción</th>
+                                            <th>Última Ejecución</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cronTableBody">
+                                        <!-- Las tareas se cargarán aquí dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ver Crontab -->
+                <div id="crontab-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Crontab Actual</h1>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Contenido del Crontab</h5>
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadCrontabContent()">
+                                <i class="bi bi-arrow-clockwise"></i> Refrescar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <pre id="crontabContent" class="bg-dark text-light p-3 rounded">Cargando...</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs -->
+                <div id="logs-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Logs de Ejecución</h1>
+                    
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="logStatusFilter" onchange="filterLogs()">
+                                <option value="all">Todos los estados</option>
+                                <option value="success">Solo éxitos</option>
+                                <option value="error">Solo errores</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="logSearchInput" placeholder="Buscar en comando o salida..." onkeyup="filterLogs()">
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="loadLogs()">
+                                <i class="bi bi-arrow-clockwise"></i> Refrescar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="clearLogs()">
+                                <i class="bi bi-trash"></i> Limpiar Logs
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Historial de Ejecuciones (Últimos 50 registros)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="logsContainer" class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%">Fecha/Hora</th>
+                                            <th style="width: 35%">Tarea</th>
+                                            <th style="width: 10%">Estado</th>
+                                            <th style="width: 40%">Salida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logsTableBody">
+                                        <!-- Logs se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración -->
+                <div id="config-section" class="content-section" style="display: none;">
+                    <h1 class="mb-4">Configuración</h1>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Configuración General</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Zona Horaria</label>
+                                        <select class="form-select" id="timezone">
+                                            <option value="America/Mexico_City">México (GMT-6)</option>
+                                            <option value="America/New_York">Nueva York (GMT-5)</option>
+                                            <option value="Europe/Madrid">Madrid (GMT+1)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tema</label>
+                                        <select class="form-select" id="theme">
+                                            <option value="light">Claro</option>
+                                            <option value="dark">Oscuro</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="saveConfig()">Guardar Configuración</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Backup y Restauración</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary" onclick="exportTasks()">
+                                            <i class="bi bi-download"></i> Exportar Todas las Tareas
+                                        </button>
+                                        <button class="btn btn-outline-success" onclick="document.getElementById('importFile').click()">
+                                            <i class="bi bi-upload"></i> Importar Tareas
+                                        </button>
+                                        <input type="file" id="importFile" accept=".json" style="display: none" onchange="handleImport(event)">
+                                        <button class="btn btn-outline-warning" onclick="backupCrontab()">
+                                            <i class="bi bi-archive"></i> Backup Crontab
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para nueva tarea -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Tarea Cron</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="cronForm">
+                        <div class="mb-3">
+                            <label for="cronCommand" class="form-label">Comando</label>
+                            <input type="text" class="form-control" id="cronCommand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cronDescription" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="cronDescription">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label for="cronMinute" class="form-label">Minuto</label>
+                                <input type="text" class="form-control" id="cronMinute" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronHour" class="form-label">Hora</label>
+                                <input type="text" class="form-control" id="cronHour" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronDay" class="form-label">Día</label>
+                                <input type="text" class="form-control" id="cronDay" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronMonth" class="form-label">Mes</label>
+                                <input type="text" class="form-control" id="cronMonth" placeholder="*" value="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="cronWeekday" class="form-label">Día Semana</label>
+                                <input type="text" class="form-control" id="cronWeekday" placeholder="*" value="*">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-info" id="cronPreview" style="display: none;">
+                                <strong>Vista previa:</strong> <span id="cronDescription"></span>
+                            </div>
+                            <small class="text-muted">
+                                <strong>Ejemplos válidos:</strong><br>
+                                • <code>30 9 * * *</code> - Diario a las 9:30<br>
+                                • <code>0 */2 * * *</code> - Cada 2 horas<br>
+                                • <code>*/15 * * * *</code> - Cada 15 minutos<br>
+                                • <code>0-9</code> - Rango del 0 al 9
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCronJob()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar tarea -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Tarea Cron</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCronForm">
+                        <input type="hidden" id="editTaskIndex">
+                        <div class="mb-3">
+                            <label for="editCronCommand" class="form-label">Comando</label>
+                            <input type="text" class="form-control" id="editCronCommand" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCronDescription" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="editCronDescription">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label for="editCronMinute" class="form-label">Minuto</label>
+                                <input type="text" class="form-control" id="editCronMinute" placeholder="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="editCronHour" class="form-label">Hora</label>
+                                <input type="text" class="form-control" id="editCronHour" placeholder="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="editCronDay" class="form-label">Día</label>
+                                <input type="text" class="form-control" id="editCronDay" placeholder="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="editCronMonth" class="form-label">Mes</label>
+                                <input type="text" class="form-control" id="editCronMonth" placeholder="*">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="editCronWeekday" class="form-label">Día Semana</label>
+                                <input type="text" class="form-control" id="editCronWeekday" placeholder="*">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="alert alert-info" id="editCronPreview" style="display: none;">
+                                <strong>Vista previa:</strong> <span id="editCronDescription"></span>
+                            </div>
+                            <small class="text-muted">
+                                <strong>Ejemplos válidos:</strong><br>
+                                • <code>30 9 * * *</code> - Diario a las 9:30<br>
+                                • <code>0 */2 * * *</code> - Cada 2 horas<br>
+                                • <code>*/15 * * * *</code> - Cada 15 minutos<br>
+                                • <code>0-9</code> - Rango del 0 al 9
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="updateCronJob()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

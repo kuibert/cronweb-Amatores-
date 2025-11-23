@@ -1,0 +1,110 @@
+[
+    {
+        "timestamp": "2025-11-20 03:36:44",
+        "command": "echo Tarea semanal ejecutada",
+        "status": "success",
+        "output": "Tarea semanal ejecutada"
+    },
+    {
+        "timestamp": "2025-11-20 03:36:55",
+        "command": "echo Tarea semanal ejecutada",
+        "status": "success",
+        "output": "Tarea semanal ejecutada"
+    },
+    {
+        "timestamp": "2025-11-20 03:38:10",
+        "command": "echo Tarea mensual ejecutada",
+        "status": "success",
+        "output": "Tarea mensual ejecutada"
+    },
+    {
+        "timestamp": "2025-11-20 03:38:12",
+        "command": "echo \"Hola mundo\"",
+        "status": "success",
+        "output": "\"Hola mundo\""
+    },
+    {
+        "timestamp": "2025-11-22 04:18:01",
+        "command": "echo Tarea diaria ejecutada",
+        "status": "success",
+        "output": "Tarea diaria ejecutada"
+    },
+    {
+        "timestamp": "2025-11-22 04:18:21",
+        "command": "echo Tarea diaria ejecutada",
+        "status": "success",
+        "output": "Tarea diaria ejecutada"
+    },
+    {
+        "timestamp": "2025-11-22 04:18:42",
+        "command": "echo Tarea mensual ejecutada",
+        "status": "success",
+        "output": "Tarea mensual ejecutada"
+    },
+    {
+        "timestamp": "2025-11-23 02:55:01",
+        "command": "echo Test desde terminal",
+        "status": "success",
+        "output": "Test desde terminal"
+    },
+    {
+        "timestamp": "2025-11-23 03:10:57",
+        "command": "echo Test funcionando correctamente",
+        "status": "success",
+        "output": "Test funcionando correctamente"
+    },
+    {
+        "timestamp": "2025-11-23 03:14:37",
+        "command": "echo Tarea diaria ejecutada345",
+        "status": "error",
+        "output": "sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper\nsudo: a password is required"
+    },
+    {
+        "timestamp": "2025-11-23 03:14:42",
+        "command": "echo Tarea semanal ejecutada",
+        "status": "error",
+        "output": "sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper\nsudo: a password is required"
+    },
+    {
+        "timestamp": "2025-11-23 03:16:36",
+        "command": "echo Tarea diaria ejecutada345",
+        "status": "success",
+        "output": "Tarea diaria ejecutada345"
+    },
+    {
+        "timestamp": "2025-11-23 03:16:39",
+        "command": "echo Tarea semanal ejecutada",
+        "status": "success",
+        "output": "Tarea semanal ejecutada"
+    },
+    {
+        "timestamp": "2025-11-23 03:20:50",
+        "command": "echo Tarea diaria ejecutada",
+        "status": "success",
+        "output": "Tarea diaria ejecutada"
+    },
+    {
+        "timestamp": "2025-11-23 03:23:52",
+        "command": "echo \"Test sync automatico\"",
+        "status": "success",
+        "output": "Test sync automatico"
+    },
+    {
+        "timestamp": "2025-11-23 03:30:26",
+        "command": "echo Tarea diaria ejecutada0",
+        "status": "success",
+        "output": "Tarea diaria ejecutada0"
+    },
+    {
+        "timestamp": "2025-11-23 03:51:21",
+        "command": "echo Tarea editada",
+        "status": "success",
+        "output": "Tarea editada"
+    },
+    {
+        "timestamp": "2025-11-23 03:51:51",
+        "command": "echo Tarea diaria ejecutada",
+        "status": "success",
+        "output": "Tarea diaria ejecutada"
+    }
+]

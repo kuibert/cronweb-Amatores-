@@ -1,0 +1,83 @@
+[
+    {
+        "id": "691e7e4b8ca13",
+        "command": "echo Tarea editada",
+        "description": "Tarea editada desde test",
+        "schedule": "0 10 * * *",
+        "enabled": true,
+        "created_at": "2025-11-20 03:34:51",
+        "updated_at": "2025-11-23 03:41:12",
+        "last_execution": "2025-11-23 03:51:21",
+        "last_status": "success"
+    },
+    {
+        "id": "691e7eb8284b6",
+        "command": "echo Tarea semanal ejecutada",
+        "description": "Tarea semanal los lunes a las 9:00 AM",
+        "schedule": "* 9 * * 1",
+        "enabled": false,
+        "created_at": "2025-11-20 03:36:40",
+        "last_execution": "2025-11-20 03:36:55",
+        "last_status": "success"
+    },
+    {
+        "id": "691e7ee557439",
+        "command": "echo Tarea mensual ejecutada",
+        "description": "Tarea mensual el d\u00eda 1 a las 9:00 AM",
+        "schedule": "* 9 1 * *",
+        "enabled": false,
+        "created_at": "2025-11-20 03:37:25",
+        "last_execution": "2025-11-20 03:38:10",
+        "last_status": "success"
+    },
+    {
+        "id": "691e7f0b998ff",
+        "command": "echo \"Hola mundo\" 908",
+        "description": "Tarea de prueba",
+        "schedule": "6 7 8 3 6",
+        "enabled": true,
+        "created_at": "2025-11-20 03:38:03",
+        "updated_at": "2025-11-23 03:52:19"
+    },
+    {
+        "id": "69212b5bca8cf",
+        "command": "echo Tarea diaria ejecutada",
+        "description": "Tarea diaria a las 9:00 AM",
+        "schedule": "* 9 * * *",
+        "enabled": true,
+        "created_at": "2025-11-22 04:17:47",
+        "last_execution": "2025-11-22 04:18:21",
+        "last_status": "success"
+    },
+    {
+        "id": "69212b8f3d0b5",
+        "command": "echo Tarea mensual ejecutada",
+        "description": "Tarea mensual el d\u00eda 1 a las 9:00 AM",
+        "schedule": "* 9 1 * *",
+        "enabled": true,
+        "created_at": "2025-11-22 04:18:39",
+        "last_execution": "2025-11-22 04:18:42",
+        "last_status": "success"
+    },
+    {
+        "id": "69227b65143d7",
+        "command": "echo Tarea diaria ejecutada345",
+        "description": "Tarea diaria a las 9:00 AM",
+        "schedule": "* 9 * * *",
+        "enabled": true,
+        "created_at": "2025-11-23 03:11:33",
+        "last_execution": "2025-11-23 03:16:36",
+        "last_status": "success"
+    },
+    {
+        "id": "69227d8f7589b",
+        "command": "echo Tarea diaria ejecutada",
+        "description": "Tarea diaria a las 9:00 AM",
+        "schedule": "* 9 * * *",
+        "enabled": true,
+        "created_at": "2025-11-23 03:20:47",
+        "updated_at": "2025-11-23 03:41:41",
+        "last_execution": "2025-11-23 03:51:51",
+        "last_status": "success"
+    }
+]
